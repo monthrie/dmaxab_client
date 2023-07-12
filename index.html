@@ -1,0 +1,53 @@
+<html>
+<head>
+    <script type="text/javascript" src="mds.js"></script>
+    <script type="text/javascript" src="service.js"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>Add Entry</title>
+</head>
+<body>
+    <h1>Add Entry</h1>
+    <form id="entry-form">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name"><br>
+        <label for="max">MAX#:</label><br>
+        <input type="text" id="max" name="max"><br>
+        <input type="submit" value="Submit">
+    </form>
+    <script type="text/javascript">
+        // Wait for the HTML document to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup the form submission event handler
+            document.getElementById('entry-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+    
+                // Get the user's input data
+                const name = document.getElementById('name').value;
+                const max = document.getElementById('max').value;
+               
+                // log the collected data
+                MDS.log('name: ' + name + ' max: ' + max);
+    
+                // Construct the message data
+                const message = {"type":"ADD_ADDRESS","data":{"name":name,"max":max}};
+               
+               //log the message data
+                MDS.log('message: ' + JSON.stringify(message));
+    
+                // Send the Maxima message
+                sendMessage(message, 'MAX#0x30819F300D06092A864886F70D010101050003818D00308189028181009BB7465C454425291EBC2A851A4852F8C1B02F7A173A15780B304E2DCA663CC69AF15CA39D21914F5C1C4D20BE1066A29446F1B6AC8BC7FE1AE466D7E672C9BFAB64BA35BEE30ED8217BDB95959EA1B4410C70EF348051642876A8E99138AFCF5933E6DB3DB3ADBB3D418DBFFF30675D8BBB1A534DC5EE03740801579A73A0D10203010001#MxG18HGG6FJ038614Y8CW46US6G20810K0070CD00Z83282G60G1C0ANS2ENGJEFBYJM2SCQFR3U3KBJNP1WS9B0KG1Z2QG5T68S6N2C15B2FD7WHV5VYCKBDW943QZJ9MCZ03ESQ0TDR86PEGUFRSGEJBANN91TY2RVPQTVQSUP26TNR399UE9PPJNS75HJFTM4DG2NZRUDWP06VQHHVQSGT9ZFV0SCZBZDY0A9BK96R7M4Q483GN2T04P30GM5C10608005FHRRH4@78.141.238.36:9001', function(response) {
+                    MDS.log('Message sent response: ' + JSON.stringify(response));
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+<!--       
+
+move these two files to the other minidapp 
+run the other minidapp from phone or some such
+add both to github as your own first ever motherfucking code!!
+
+          } -->
