@@ -15,24 +15,38 @@ MDS.init(function(msg) {
         if (msg.data.application == "dmaxabclient") {
             // Log the received data
             MDS.log('Received xdata: ' + msg.data.data);
+        
+            // Remove the '0x' prefix from the hex string, if it exists
+            let hexData = msg.data.data;
+            if (hexData.startsWith("0x")) {
+                hexData = hexData.substring(2);
+            }
+        
             // Convert the data from hex to string
-            MDS.cmd(`convert from:HEX to:String data:${msg.data.data}`, function(resp) {
+            MDS.cmd(`convert from:HEX to:String data:${hexData}`, function(resp) {
+                // Remove single quotes from the string
+                let jsonString = resp.response.conversion.replace(/'/g, "");
+        
                 // Parse the string as JSON
-                const jsonData = JSON.parse(resp.response.conversion);
+                const jsonData = JSON.parse(jsonString);
+        
                 // Log the parsed JSON data
                 MDS.log('Received JSON data: ' + JSON.stringify(jsonData));
-
-            // Check if the message is a "TABLE_DATA" message
-            if (jsonData.type == "TABLE_DATA") {
-                // Extract the 'entries' from the JSON data
-                const entries = jsonData.data; // Array of entries
-                // Log the entries
-                MDS.log('Received entries: ' + JSON.stringify(entries));
-                // Update the AddressBook table with the received entries
-                updateTable(entries);
+        
+                // Check if the message is a "TABLE_DATA" message
+                if (jsonData.type == "TABLE_DATA") {
+                    // Extract the 'entries' from the JSON data
+                    const entries = jsonData.data; // Array of entries
+        
+                    // Log the entries
+                    MDS.log('Received entries: ' + JSON.stringify(entries));
+        
+                    // Update the AddressBook table with the received entries
+                    updateTable(entries);
                 }
             });
         }
+        
     }
 });
 
