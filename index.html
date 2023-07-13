@@ -25,6 +25,7 @@
         <input type="text" id="max" name="max"><br>
         <input type="submit" value="Submit">
     </form>
+    <button id="refresh-button">Refresh</button>
     <script type="text/javascript">
 
         // Wait for the HTML document to be fully loaded
@@ -32,6 +33,7 @@
             // Setup the form submission event handler
             document.getElementById('entry-form').addEventListener('submit', function(event) {
                 event.preventDefault();
+                sendTableRequest();
     
                 // Get the user's input data
                 const name = document.getElementById('name').value;
@@ -51,7 +53,15 @@
                     MDS.log('Message sent response: ' + JSON.stringify(response));
                 });
             });
+
+            // Setup the refresh button click event handler
+            document.getElementById('refresh-button').addEventListener('click', function(event) {
+                event.preventDefault();
+                sendTableRequest();
+            });
+            
         });
+
     </script>
 </body>
 </html>
