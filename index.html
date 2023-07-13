@@ -6,7 +6,7 @@
     <title>Add Entry</title>
 </head>
 <body>
-    <h1>Address Book</h1>
+    <h1>Address Book - CLIENT</h1>
     <table id="address-book">
         <thead>
             <tr>
@@ -33,7 +33,6 @@
             // Setup the form submission event handler
             document.getElementById('entry-form').addEventListener('submit', function(event) {
                 event.preventDefault();
-                sendTableRequest();
     
                 // Get the user's input data
                 const name = document.getElementById('name').value;
