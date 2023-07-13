@@ -4,8 +4,6 @@
 * @monthrie
 */
 
-// refactor all this properly bring in to line with server code
-
 MDS.init(function(msg) {
     if (msg.event == "MAXIMA" && msg.data.application == "dmaxabclient") {
         let hexData = msg.data.data;
