@@ -4,9 +4,38 @@
     <script type="text/javascript" src="service.js"></script>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Add Entry</title>
+    <!-- Added a style tag to apply CSS to the entire page -->
+    <style>
+        /* Styles for the entire body */
+        body {
+            background-color: lightgrey; /* Set background color to light grey */
+            display: flex; /* Set the display to flex */
+            flex-direction: column; /* Arrange children elements in a column */
+            align-items: center; /* Center children elements horizontally */
+            padding: 20px; /* Add some space around the content */
+        }
+        /* Styles for the table */
+        table {
+            border-collapse: collapse; /* Collapse the borders into single lines */
+            width: 100%; /* Make the table take up the full width */
+            margin-bottom: 20px; /* Add some space below the table */
+        }
+        th, td {
+            border: 1px solid black; /* Add a border around each cell */
+            padding: 10px; /* Add some space around the cell content */
+            text-align: center; /* Center the text in the cells */
+        }
+        /* Styles for the button */
+        button {
+            padding: 5px 10px; /* Add some space around the button text */
+            cursor: pointer; /* Change the cursor to a hand when hovering over the button */
+        }
+    </style>
 </head>
 <body>
-    <h1>Address Book</h1>
+    <h1>DXP.HUB</h1>
+    <!-- Moved the refresh button here, just below the table -->
+  
     <table id="address-book">
         <thead>
             <tr>
@@ -17,6 +46,9 @@
         <tbody>
         </tbody>
     </table>
+    <button id="refresh-button">update</button>
+    <!-- some space between the table and the form -->
+    <br>
     <h1>Add Entry</h1>
     <form id="entry-form">
         <label for="name">Name:</label><br>
@@ -51,7 +83,15 @@
                     MDS.log('Message sent response: ' + JSON.stringify(response));
                 });
             });
+
+            // Setup the refresh button click event handler
+            document.getElementById('refresh-button').addEventListener('click', function(event) {
+                event.preventDefault();
+                sendTableRequest();
+            });
+            
         });
+
     </script>
 </body>
 </html>
