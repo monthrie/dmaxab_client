@@ -4,55 +4,23 @@
 * @monthrie
 */
 
-// refactor all this properly bring in to line with server code
-
-// Initialize MDS
 MDS.init(function(msg) {
-    
-    // Check if the received message is a MAXIMA message
-    if (msg.event == "MAXIMA") {
-        //if it is then log it
-        MDS.log('Received MAXIMA message: ' + JSON.stringify(msg));
-        // Check if the application is the one we're interested in
-        if (msg.data.application == "dmaxabclient") {
-            // Log the received data
-            MDS.log('Received xdata: ' + msg.data.data);
-        
-            // Remove the '0x' prefix from the hex string, if it exists
-            let hexData = msg.data.data;
-            if (hexData.startsWith("0x")) {
-                hexData = hexData.substring(2);
-            }
-        
-            // Convert the data from hex to string
-            MDS.cmd(`convert from:HEX to:String data:${hexData}`, function(resp) {
-                // Remove single quotes from the string
-                let jsonString = resp.response.conversion.replace(/'/g, "");
-        
-                // Parse the string as JSON
-                const jsonData = JSON.parse(jsonString);
-        
-                // Log the parsed JSON data
-                MDS.log('Received JSON data: ' + JSON.stringify(jsonData));
-        
-                // Check if the message is a "TABLE_DATA" message
-                if (jsonData.type == "TABLE_DATA") {
-                    // Extract the 'entries' from the JSON data
-                    const entries = jsonData.data; // Array of entries
-        
-                    // Log the entries
-                    MDS.log('Received entries: ' + JSON.stringify(entries));
-        
-                    // Update the AddressBook table with the received entries
-                    updateTable(entries);
-                }
-            });
+    if (msg.event == "MAXIMA" && msg.data.application == "dmaxabclient") {
+        let hexData = msg.data.data;
+        if (hexData.startsWith("0x")) {
+            hexData = hexData.substring(2);
         }
-        
+        MDS.cmd(`convert from:HEX to:String data:${hexData}`, function(resp) {
+            let jsonString = resp.response.conversion.replace(/'/g, "");
+            const jsonData = JSON.parse(jsonString);
+            if (jsonData.type == "TABLE_DATA") {
+                const entries = jsonData.data;
+                updateTable(entries);
+            }
+        });
     }
 });
 
-// Function to update the table with new data
 function updateTable(entries) {
     let tableHTML = '';
     for (let i = 0; i < entries.length; i++) {
@@ -61,69 +29,33 @@ function updateTable(entries) {
     document.querySelector('#address-book tbody').innerHTML = tableHTML;
 }
 
-/**
- * Sends a Maxima message with the provided data
- * @param {object} message The message data
- * @param {string} address The MAX# address to send the message to
- * @param {function} callback A callback function to run after the message is sent
- */
-function sendMessage(message, address, callback) {
-    // Construct the Maxima command string
-    var maxcmd = "maxima action:send poll:true to:" + address + " application:dmaxab data:" + JSON.stringify(message);
-
-    // Send the Maxima command
-    MDS.cmd(maxcmd, function(msg) {
-        MDS.log('Sent message: ' + JSON.stringify(msg));
-
-        // Call the callback function, if one was provided
-        if (callback) {
-            callback(msg);
+function sendMessage(message, address) {
+    const maxCmd = `maxima action:send poll:true to:${address} application:dmaxab data:${JSON.stringify(message)}`;
+    MDS.cmd(maxCmd, function(response) {
+        if (response.status) {
+            MDS.log('Message sent successfully');
+        } else {
+            MDS.log('Error sending message: ' + response.error);
         }
     });
 }
 
-//function to get clients maxima address
-function getClientAddress() {
-    // Construct the Maxima command string
+function getClientAddress(callback) {
     MDS.cmd('maxima', function(response) {
         if (response.status) {
-            //extract the 'contact' from the response
-            const clientContact = response.response.contact;
-            // Log the contact
-            MDS.log('Client contact: ' + clientContact);
-            // Call sendTableRequest with the obtained contact
-            sendTableRequest(clientContact);
+            callback(response.response.contact);
         } else {
-            MDS.log('There was an error getting the client contact: ' + response.error);
+            MDS.log('Error getting client address: ' + response.error);
         }
     });
 }
 
-// Function to send a data request message to the server --> CHAGNED RECENTLY
 function sendTableRequest() {
-    // Retrieve the client's contact
-    MDS.cmd('maxima', function(resp) {
-        // Extract the client's contact from the response
-        const clientContact = resp.response.contact;
-
-        // Define the data for the message
+    getClientAddress(function(contact) {
         const data = {
             type: 'TABLE_REQUEST',
-            data: {
-                contact: clientContact
-            }
+            data: { contact }
         };
-
-        // Construct the Maxima command string
-        const maxCmd = `maxima action:send to:MAX#0x30819F300D06092A864886F70D010101050003818D00308189028181009BB7465C454425291EBC2A851A4852F8C1B02F7A173A15780B304E2DCA663CC69AF15CA39D21914F5C1C4D20BE1066A29446F1B6AC8BC7FE1AE466D7E672C9BFAB64BA35BEE30ED8217BDB95959EA1B4410C70EF348051642876A8E99138AFCF5933E6DB3DB3ADBB3D418DBFFF30675D8BBB1A534DC5EE03740801579A73A0D10203010001#MxG18HGG6FJ038614Y8CW46US6G20810K0070CD00Z83282G60G1C0ANS2ENGJEFBYJM2SCQFR3U3KBJNP1WS9B0KG1Z2QG5T68S6N2C15B2FD7WHV5VYCKBDW943QZJ9MCZ03ESQ0TDR86PEGUFRSGEJBANN91TY2RVPQTVQSUP26TNR399UE9PPJNS75HJFTM4DG2NZRUDWP06VQHHVQSGT9ZFV0SCZBZDY0A9BK96R7M4Q483GN2T04P30GM5C10608005FHRRH4@78.141.238.36:9001 application:dmaxab data:${JSON.stringify(data)}`;
-
-        // Send the Maxima command
-        MDS.cmd(maxCmd, function(response) {
-            if (response.status) {
-                MDS.log('Table request sent successfully');
-            } else {
-                MDS.log('There was an error sending the table request: ' + response.error);
-            }
-        });
+        sendMessage(data, "MAX#0x30819F300D06092A864886F70D010101050003818D00308189028181009BB7465C454425291EBC2A851A4852F8C1B02F7A173A15780B304E2DCA663CC69AF15CA39D21914F5C1C4D20BE1066A29446F1B6AC8BC7FE1AE466D7E672C9BFAB64BA35BEE30ED8217BDB95959EA1B4410C70EF348051642876A8E99138AFCF5933E6DB3DB3ADBB3D418DBFFF30675D8BBB1A534DC5EE03740801579A73A0D10203010001#MxG18HGG6FJ038614Y8CW46US6G20810K0070CD00Z83282G60G1C0ANS2ENGJEFBYJM2SCQFR3U3KBJNP1WS9B0KG1Z2QG5T68S6N2C15B2FD7WHV5VYCKBDW943QZJ9MCZ03ESQ0TDR86PEGUFRSGEJBANN91TY2RVPQTVQSUP26TNR399UE9PPJNS75HJFTM4DG2NZRUDWP06VQHHVQSGT9ZFV0SCZBZDY0A9BK96R7M4Q483GN2T04P30GM5C10608005FHRRH4@78.141.238.36:9001");
     });
 }
