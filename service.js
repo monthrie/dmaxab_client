@@ -4,6 +4,8 @@
 * @monthrie
 */
 
+// refactor all this properly bring in to line with server code
+
 // Initialize MDS
 MDS.init(function(msg) {
     
@@ -80,22 +82,48 @@ function sendMessage(message, address, callback) {
     });
 }
 
-//function to send a data request message to the server
-function sendTableRequest() {
-    // Define the data
-    const data = {
-        type: 'TABLE_REQUEST'
-    };
-
+//function to get clients maxima address
+function getClientAddress() {
     // Construct the Maxima command string
-    const maxCmd = `maxima action:send to:MAX#0x30819F300D06092A864886F70D010101050003818D00308189028181009BB7465C454425291EBC2A851A4852F8C1B02F7A173A15780B304E2DCA663CC69AF15CA39D21914F5C1C4D20BE1066A29446F1B6AC8BC7FE1AE466D7E672C9BFAB64BA35BEE30ED8217BDB95959EA1B4410C70EF348051642876A8E99138AFCF5933E6DB3DB3ADBB3D418DBFFF30675D8BBB1A534DC5EE03740801579A73A0D10203010001#MxG18HGG6FJ038614Y8CW46US6G20810K0070CD00Z83282G60G1C0ANS2ENGJEFBYJM2SCQFR3U3KBJNP1WS9B0KG1Z2QG5T68S6N2C15B2FD7WHV5VYCKBDW943QZJ9MCZ03ESQ0TDR86PEGUFRSGEJBANN91TY2RVPQTVQSUP26TNR399UE9PPJNS75HJFTM4DG2NZRUDWP06VQHHVQSGT9ZFV0SCZBZDY0A9BK96R7M4Q483GN2T04P30GM5C10608005FHRRH4@78.141.238.36:9001 application:dmaxab data:${JSON.stringify(data)}`;
-
-    // Send the Maxima command
-    MDS.cmd(maxCmd, function(response) {
+    MDS.cmd('maxima', function(response) {
         if (response.status) {
-            MDS.log('Table request sent successfully');
+            //extract the 'contact' from the response
+            const clientContact = response.response.contact;
+            // Log the contact
+            MDS.log('Client contact: ' + clientContact);
+            // Call sendTableRequest with the obtained contact
+            sendTableRequest(clientContact);
         } else {
-            MDS.log('There was an error sending the table request: ' + response.error);
+            MDS.log('There was an error getting the client contact: ' + response.error);
         }
+    });
+}
+
+// Function to send a data request message to the server --> CHAGNED RECENTLY
+function sendTableRequest() {
+    // Retrieve the client's contact
+    MDS.cmd('maxima', function(resp) {
+        // Extract the client's contact from the response
+        const clientContact = resp.response.contact;
+
+        // Define the data for the message
+        const data = {
+            type: 'TABLE_REQUEST',
+            data: {
+                contact: clientContact
+            }
+        };
+
+        // Construct the Maxima command string
+        const maxCmd = `maxima action:send to:MAX#0x30819F300D06092A864886F70D010101050003818D00308189028181009BB7465C454425291EBC2A851A4852F8C1B02F7A173A15780B304E2DCA663CC69AF15CA39D21914F5C1C4D20BE1066A29446F1B6AC8BC7FE1AE466D7E672C9BFAB64BA35BEE30ED8217BDB95959EA1B4410C70EF348051642876A8E99138AFCF5933E6DB3DB3ADBB3D418DBFFF30675D8BBB1A534DC5EE03740801579A73A0D10203010001#MxG18HGG6FJ038614Y8CW46US6G20810K0070CD00Z83282G60G1C0ANS2ENGJEFBYJM2SCQFR3U3KBJNP1WS9B0KG1Z2QG5T68S6N2C15B2FD7WHV5VYCKBDW943QZJ9MCZ03ESQ0TDR86PEGUFRSGEJBANN91TY2RVPQTVQSUP26TNR399UE9PPJNS75HJFTM4DG2NZRUDWP06VQHHVQSGT9ZFV0SCZBZDY0A9BK96R7M4Q483GN2T04P30GM5C10608005FHRRH4@78.141.238.36:9001 application:dmaxab data:${JSON.stringify(data)}`;
+
+        // Send the Maxima command
+        MDS.cmd(maxCmd, function(response) {
+            if (response.status) {
+                MDS.log('Table request sent successfully');
+            } else {
+                MDS.log('There was an error sending the table request: ' + response.error);
+            }
+        });
     });
 }
