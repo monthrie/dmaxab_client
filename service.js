@@ -24,10 +24,28 @@ MDS.init(function(msg) {
 function updateTable(entries) {
     let tableHTML = '';
     for (let i = 0; i < entries.length; i++) {
-    tableHTML += `<tr><td>${entries[i].name}</td><td class="max">${entries[i].max}</td><td><button onclick="deleteRow(${entries[i].ID})">Delete</button></td></tr>`;
+      tableHTML += `<tr><td>${entries[i].name}</td><td class="max">${entries[i].max}</td><td><button class="copy-button">Copy</button></td></tr>`;
     }
     document.querySelector('#address-book tbody').innerHTML = tableHTML;
-}
+  
+    // Add an event listener to all copy buttons
+    document.querySelectorAll('.copy-button').forEach(function(button) {
+      button.addEventListener('click', function(event) {
+        // Get the corresponding max value from the table row
+        var max = this.parentNode.previousElementSibling.textContent;
+        copyContact(max);
+      });
+    });
+  }
+
+  function copyContact(max) {
+    navigator.clipboard.writeText(max).then(function() {
+      console.log('Copied to clipboard');
+    }).catch(function(error) {
+      console.error('Failed to copy to clipboard:', error);
+    });
+  }
+
 
 function sendMessage(message, address, callback) {
     const maxCmd = `maxima action:send poll:true to:${address} application:dmaxab data:${JSON.stringify(message)}`;
