@@ -24,12 +24,12 @@ MDS.init(function(msg) {
 function updateTable(entries) {
     let tableHTML = '';
     for (let i = 0; i < entries.length; i++) {
-        tableHTML += `<tr><td>${entries[i].name}</td><td>${entries[i].max}</td></tr>`;
+    tableHTML += `<tr><td>${entries[i].name}</td><td class="max">${entries[i].max}</td><td><button onclick="deleteRow(${entries[i].ID})">Delete</button></td></tr>`;
     }
     document.querySelector('#address-book tbody').innerHTML = tableHTML;
 }
 
-function sendMessage(message, address) {
+function sendMessage(message, address, callback) {
     const maxCmd = `maxima action:send poll:true to:${address} application:dmaxab data:${JSON.stringify(message)}`;
     MDS.cmd(maxCmd, function(response) {
         if (response.status) {
@@ -37,8 +37,13 @@ function sendMessage(message, address) {
         } else {
             MDS.log('Error sending message: ' + response.error);
         }
+        // Call the provided callback function
+        if (callback) {
+            callback(response);
+        }
     });
 }
+
 
 function getClientAddress(callback) {
     MDS.cmd('maxima', function(response) {
