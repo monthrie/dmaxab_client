@@ -9,6 +9,7 @@ MDS.init(function(msg) {
         let hexData = msg.data.data;
         if (hexData.startsWith("0x")) {
             hexData = hexData.substring(2);
+            
         }
         MDS.cmd(`convert from:HEX to:String data:${hexData}`, function(resp) {
             let jsonString = resp.response.conversion.replace(/'/g, "");
@@ -16,8 +17,14 @@ MDS.init(function(msg) {
             if (jsonData.type == "TABLE_DATA") {
                 const entries = jsonData.data;
                 updateTable(entries);
-    
+
             }
+
+            else if (jsonData.type == "NAME_NOT_UNIQUE") { //<------
+                // Call the function we wrote earlier to display an alert
+                handleNameNotUniqueMessage(jsonData); //<------
+            }
+
         });
     }
 });
@@ -38,6 +45,13 @@ function updateTable(entries) {
       });
     });
   }
+
+// Function to handle "NAME_NOT_UNIQUE" messages from the server
+function handleNameNotUniqueMessage(message) {
+    // Display the message from the server in an alert dialog
+    alert(message.data); //<------
+}
+
 
   function copyContact(max) {
     navigator.clipboard.writeText(max).then(function() {
