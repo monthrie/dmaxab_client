@@ -103,8 +103,40 @@
                     MDS.log(err);
                     return;
                 }
-
                 document.getElementById('user-maxima-name').textContent = name;
+            });
+
+                // Fetch the user's public key and mls
+                getPublicKey(function(err, publicKey) {
+                        if (err) {
+                            MDS.log(err);
+                            return;
+                        }
+
+                getMLS(function(err, mls) {
+                    if (err) {
+                        MDS.log(err);
+                        return;
+                    }
+
+                    // Construct the MAX# 
+                    var maxAddress = createMaxAddress(publicKey, mls);
+
+                    // Create the command string
+                    var command = 'maxextra action:getaddress maxaddress:' + maxAddress;
+
+                    // Run the command using mds.cmd
+                    mds.cmd(command, function(err, response) {
+                        if (err) {
+                            MDS.log(err);
+                            return;
+                        }
+
+                        // Check the 'success' field in the response.
+                        var permanentAddressStatus = response.response.success ? 'True' : 'False';
+                        document.getElementById('user-permanent-address-status').textContent = permanentAddressStatus;
+                    });
+                });
             });
 
 /*            
