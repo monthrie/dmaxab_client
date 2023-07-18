@@ -4,55 +4,69 @@
     <script type="text/javascript" src="service.js"></script>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Add Entry</title>
-    <!-- Added a style tag to apply CSS to the entire page -->
     <style>
         /* Styles for the entire body */
         body {
-            background-color: lightgrey; /* Set background color to light grey */
-            display: flex; /* Set the display to flex */
-            flex-direction: column; /* Arrange children elements in a column */
-            align-items: center; /* Center children elements horizontally */
-            padding: 20px; /* Add some space around the content */
+            background-color: #f2f2f2;  /* Changed to a light gray color */
+            display: flex; /* Keep as flex */
+            flex-direction: column;  /* Changed to column to have all elements vertically */
+            align-items: center;  /* Center items horizontally */
+            padding: 20px; /* Keep padding */
+            font-family: Arial, sans-serif;  /* Changed font to Arial */
+        }
+        /* Styles for the user info section */
+        #user-info {
+            width: 100%;  /* User info takes up full width */
+            padding: 20px;  /* Add some padding inside the user info section */
+            background-color: #fff;  /* User info has a white background */
+            border-radius: 5px;  /* Rounded corners for the user info section */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);  /* Subtle shadow for the user info section */
+            margin-bottom: 20px; /* Add some space below the user info section */
         }
         /* Styles for the table */
         table {
-            border-collapse: collapse; /* Collapse the borders into single lines */
-            width: 100%; /* Make the table take up the full width */
+            width: 100%; /* Table takes up full width */
+            border-collapse: collapse; /* Keep as collapse */
             margin-bottom: 20px; /* Add some space below the table */
         }
         th, td {
-        border: 1px solid black;
-        padding: 10px;
-        text-align: center;
-    }
+            border: 1px solid #ddd;  /* Changed border color to a light gray */
+            padding: 10px;  /* Increased padding for more space */
+            text-align: left;  /* Left-aligned text looks more professional */
+        }
         td.max {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 150px; /* adjust this value as needed */
-
+            border: 1px solid #ddd;  /* Changed border color to a light gray */
+            padding: 10px;  /* Increased padding for more space */
+            text-align: left;  /* Left-aligned text looks more professional */
+            overflow: hidden;  /* Keep as is */
+            text-overflow: ellipsis;  /* Keep as is */
+            white-space: nowrap;  /* Keep as is */
+            max-width: 150px; /* Keep as is */
         }
         /* Styles for the button */
         button {
             padding: 5px 10px; /* Add some space around the button text */
             cursor: pointer; /* Change the cursor to a hand when hovering over the button */
+            background-color: #686868; /* Set button color to a grey */
+            color: white; /* Set text color to white */
+            border: none; /* Remove border */
+            border-radius: 3px; /* Slightly round the corners */
+        }
+        button:hover {
+            background-color: #007B9A; /* Darken the button color when hovered */
         }
     </style>
 </head>
 <body>
+    <!-- Main title -->
     <h1>Maxima Name Service</h1>
-
-     <!-- User info section -->
-     <div id="user-info">
+    <!-- User info section -->
+    <div id="user-info">
         <h2>Your Info</h2>
         <p>Maxima Name: <span id="user-maxima-name"></span></p>
         <p>Permanent Address Status: <span id="user-permanent-address-status"></span></p>
     </div>
-
-  
+    <!-- Table -->
     <table id="address-book">
         <thead>
             <tr>
@@ -63,17 +77,19 @@
         <tbody>
         </tbody>
     </table>
-    <button id="refresh-button">update</button>
-    <!-- some space between the table and the form -->
-    <br>
-    <h1>Add Entry</h1>
+    <div style="align-self: flex-start;">
+        <button id="refresh-button">Update Address Book</button>
+    </div>
+    <!-- Add Entry Form title -->
+    <h3>Add Your Own MAX#</h3>
+    <!-- Add Entry Form -->
     <form id="entry-form">
         <label for="name">Name:</label><br>
         <input type="text" id="name" name="name"><br>
         <label for="max">MAX#:</label><br>
-        <input type="text" id="max" name="max"><br>
+        <input type="text" id="max" name="max">
+        <button id="add-max-button">Paste your MAX#</button><br>
         <input type="submit" value="Submit">
-        <button id="add-max-button">Add your MAX#</button>
     </form>
     <div id="feedback"></div>
     <script type="text/javascript">

@@ -32,7 +32,7 @@ MDS.init(function(msg) {
 function updateTable(entries) {
     let tableHTML = '';
     for (let i = 0; i < entries.length; i++) {
-      tableHTML += `<tr><td>${entries[i].name}</td><td class="max">${entries[i].max}</td><td><button class="copy-button">Copy</button></td></tr>`;
+      tableHTML += `<tr><td>${entries[i].name}</td><td class="max">${entries[i].max}</td><td><button class="copy-button">Copy MAX#</button></td></tr>`;
     }
     document.querySelector('#address-book tbody').innerHTML = tableHTML;
   
