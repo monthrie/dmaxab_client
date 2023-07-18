@@ -43,7 +43,15 @@
     </style>
 </head>
 <body>
-    <h1>DBAY . HUB</h1>
+    <h1>Maxima Name Service</h1>
+
+     <!-- User info section -->
+     <div id="user-info">
+        <h2>Your Info</h2>
+        <p>Maxima Name: <span id="user-maxima-name"></span></p>
+        <p>Permanent Address Status: <span id="user-permanent-address-status"></span></p>
+    </div>
+
   
     <table id="address-book">
         <thead>
@@ -65,12 +73,53 @@
         <label for="max">MAX#:</label><br>
         <input type="text" id="max" name="max"><br>
         <input type="submit" value="Submit">
+        <button id="add-max-button">Add your MAX#</button>
     </form>
     <div id="feedback"></div>
     <script type="text/javascript">
 
         // Wait for the HTML document to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
+
+        // Fetch and display user info
+            getMaximaName(function(err, name) {
+                if (err) {
+                    MDS.log(err);
+                    return;
+                }
+
+                document.getElementById('user-maxima-name').textContent = name;
+            });
+
+/*            
+            getPublicKey(function(err, publicKey) {
+                if (err) {
+                    MDS.log(err);
+                    return;
+                }
+
+                getMLS(function(err, mls) {
+                    if (err) {
+                        MDS.log(err);
+                        return;
+                    }
+
+                    const maxAddress = createMaxAddress(publicKey, mls);
+                    document.getElementById('user-permanent-address').textContent = maxAddress;
+                });
+            });
+
+            */
+
+            StaticMLSStatus(function(err, hasMLS) {
+                if (err) {
+                    MDS.log(err);
+                    return;
+                }
+
+                document.getElementById('user-permanent-address-status').textContent = hasMLS ? 'True' : 'False';
+            });
+
             // Setup the form submission event handler
             document.getElementById('entry-form').addEventListener('submit', function(event) {
                 event.preventDefault();
@@ -93,13 +142,46 @@
                     MDS.log('Callback function called');
                     MDS.log('Message sent response: ' + JSON.stringify(response));
                     var feedbackText = document.createElement('div'); // Create a new div element
-                        feedbackText.textContent = "Your data has been passed to the hub controller! It should appear soon and will be globally viewable";  // Set its text content
+                        feedbackText.textContent = "Your data has been passed to the hub controller! If they accept your entry, it will appear here soon.";  // Set its text content
                         feedbackText.style.color = "green";  // Set its color to green
                         feedbackText.style.fontWeight = "bold";  // Set its font weight to bold
                         document.getElementById('feedback').appendChild(feedbackText);  // Append it to the #feedback element
 
                 });
             });
+
+            document.getElementById('add-max-button').addEventListener('click', function(event) {
+             event.preventDefault();
+
+                // Check if the user has a static MLS
+                hasStaticMLS(function(hasMLS) {
+                    if (hasMLS) {
+                        // If they do, get the public key and MLS
+                        getPublicKey(function(err, publicKey) {
+                            if (err) {
+                                MDS.log(err);
+                                return;
+                            }
+
+                            getMLS(function(err, mls) {
+                                if (err) {
+                                    MDS.log(err);
+                                    return;
+                                }
+
+                                // Create the MAX address and fill in the form
+                                const maxAddress = createMaxAddress(publicKey, mls);
+                                document.getElementById('max').value = maxAddress;
+                                // log the collected data
+                                MDS.log('max: ' + maxAddress);
+                            });
+                        });
+                    } else {
+                        MDS.log('User does not have a static MLS');
+                    }
+                });
+            });
+
 
             // Setup the refresh button click event handler
             document.getElementById('refresh-button').addEventListener('click', function(event) {
